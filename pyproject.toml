@@ -12,7 +12,7 @@ homepage = "https://github.com/tr11/wagtail-graphql"
 keywords = ['wagtail', 'graphql', 'api', 'wagtail-graphql']
 
 [tool.poetry.dependencies]
-python = "~3.6||~3.7"
+python = "~3.6||~3.7||~3.8"
 graphene_django = "^2.2"
 graphene_django_optimizer = "^0.3.5"
 wagtail = "^2.3"
