@@ -2,6 +2,7 @@
 from graphql.execution.base import ResolveInfo
 # django
 from django.urls import reverse
+from django.urls import NoReverseMatch
 # graphene
 import graphene
 # graphene_django
@@ -11,6 +12,7 @@ from graphene_django.converter import convert_django_field
 import graphene_django_optimizer as gql_optimizer
 # wagtail images
 from wagtail.images.models import Image as wagtailImage
+from wagtail.images.shortcuts import get_rendition_or_not_found
 from wagtail.images.views.serve import generate_signature
 # app
 from ..permissions import with_collection_permissions
@@ -75,13 +77,16 @@ class Image(DjangoObjectType):
             else:
                 fp = self.get_focal_point()
                 rendition = 'fill-%dx%d-c100' % (fp.width, fp.height)
-        return self.get_rendition(rendition).url
+        return get_rendition_or_not_found(self, rendition).url
 
 
 def generate_image_url(image: wagtailImage, filter_spec: str) -> str:
     signature = generate_signature(image.pk, filter_spec)
-    url = reverse('wagtailimages_serve', args=(signature, image.pk, filter_spec))
-    return url
+    try:
+        url = reverse('wagtailimages_serve', args=(signature, image.pk, filter_spec))
+        return url
+    except NoReverseMatch:
+        return None
 
 
 def ImageQueryMixin():
