@@ -13,7 +13,7 @@ from graphene_django import DjangoObjectType
 from graphene_django.converter import convert_django_field, String, List
 # wagtail
 from wagtail.core.models import Page as wagtailPage, Site as wagtailSite
-from taggit.managers import TaggableManager, 
+from taggit.managers import TaggableManager
 from modelcluster.tags import ClusterTaggableManager
 from wagtail.core.utils import camelcase_to_underscore
 # app
@@ -93,20 +93,20 @@ class Page(interface_cls):
 
 # https://jossingram.wordpress.com/2018/04/19/wagtail-and-graphql/
 class FlatTags(graphene.String):
- 
+
     @classmethod
     def serialize(cls, value):
         tagsList = []
         for tag in value.all():
             tagsList.append(tag.name)
         return tagsList
- 
+
 @convert_django_field.register(ClusterTaggableManager)
 def convert_tag_field_to_string(field, registry=None):
     return graphene.Field(FlatTags,
         description=field.help_text,
         required=not field.null)
-    
+
 @convert_django_field.register(TaggableManager)
 def convert_field_to_string(field, _registry=None):
     return List(String, description=field.help_text, required=not field.null)
